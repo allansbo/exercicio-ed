@@ -9,16 +9,17 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <stdbool.h>
-#define CID 20
+#define CID 128
 
-typedef char nomeCidade;
+typedef char NOMECIDADE;
 
 typedef struct{
-  nomeCidade A[CID];
+  NOMECIDADE A[CID];
 }REGISTRO;
 
 typedef struct aux{
   REGISTRO reg;
+  struct aux* ant;
   struct aux* prox;
 }CIDADE;
 
@@ -40,6 +41,44 @@ void finalizarLista (LISTA* l){
     free(apagar);
   }
   l->inicio = NULL;
+}
+
+void exibirLista(LISTA* l){
+  PONT end = l->inicio;
+  printf("Lista: \" ");
+  while(end != NULL) {
+    printf("%s ", end->reg.A);
+    end = end->prox;
+  }
+  printf("\"\n");
+}
+
+PONT buscaSequencialExc(LISTA* l, NOMECIDADE ch, PONT* ant){
+  *ant = NULL;
+  PONT atual = l->inicio;
+  while ((atual != NULL) && (atual->reg.A < ch)) {
+    *ant = atual;
+    atual = atual->prox;
+  }
+  if((atual != NULL) && (atual->reg.A == ch)) return atual;
+  return NULL;
+}
+
+bool inserirElemListaOrd(LISTA* l, REGISTRO reg){
+  NOMECIDADE ch = reg.A;
+  PONT ant, i;
+  i = buscaSequencialExc(l, ch, &ant);
+  if(i != NULL) return false;
+  i = (PONT) malloc(sizeof(CIDADE));
+  i->reg = reg;
+  if(ant == NULL){
+    i->prox = l->inicio;
+    l->inicio = i;
+  }else{
+    i->prox = ant->prox;
+    ant->prox = i;
+  }
+  return true;
 }
 
 void menu()
@@ -72,7 +111,6 @@ int main(int argc, char const *argv[]) {
   int opcao=1, pergunta;
   PONT retorno;
 
-  //inicia a lista sem nenhum dado alocado
   inicializarLista (l);
 
   while(true)
@@ -92,12 +130,22 @@ int main(int argc, char const *argv[]) {
           switch(opcao)
           {
           case 1:
+          do{
               limpaTela();
+              printf("registro: ");
+              scanf("%d",&reg.A);
+              printf("\n");
+              inserirElemListaOrd(l, reg);
               perguntaVolta();
-              scanf("%d",&pergunta);
-              break;
+              printf("[ 2 ] Novo elemento\n");
+              do{
+                  scanf("%d",&pergunta);
+              }while(pergunta<1 || pergunta>2);
+          }while(pergunta==2);
+          break;
           case 2:
               limpaTela();
+              exibirLista(l);
               perguntaVolta();
               scanf("%d",&pergunta);
               break;
@@ -129,7 +177,6 @@ int main(int argc, char const *argv[]) {
       }while(pergunta!=1);
   }
 
-  //encerrar programa
   finalizarLista(l);
   free(l);
   return 0;
