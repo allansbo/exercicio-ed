@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <stdbool.h>
+#include <string.h>
 #define CID 128
 
 typedef char NOMECIDADE;
@@ -45,12 +46,12 @@ void finalizarLista (LISTA* l){
 
 void exibirLista(LISTA* l){
   PONT end = l->inicio;
-  printf("Lista: \" ");
+  printf("--- inicio da lista---\n\n");
   while(end != NULL) {
-    printf("%s ", end->reg.A);
+    printf("- %s\n", end->reg.A);
     end = end->prox;
   }
-  printf("\"\n");
+  printf("\n--- fim da lista ---\n");
 }
 
 PONT buscaSequencialExc(LISTA* l, NOMECIDADE ch, PONT* ant){
@@ -60,7 +61,7 @@ PONT buscaSequencialExc(LISTA* l, NOMECIDADE ch, PONT* ant){
     *ant = atual;
     atual = atual->prox;
   }
-  if((atual != NULL) && (atual->reg.A == ch)) return atual;
+  if((atual != NULL) && (strcmp(atual->reg.A, ch) == 0)) return atual;
   return NULL;
 }
 
@@ -133,7 +134,7 @@ int main(int argc, char const *argv[]) {
           do{
               limpaTela();
               printf("registro: ");
-              scanf("%d",&reg.A);
+              scanf("%s",reg.A);
               printf("\n");
               inserirElemListaOrd(l, reg);
               perguntaVolta();
